@@ -1,0 +1,53 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "parcel: build debug",
+			"detail": "no-optimize",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"type": "shell",
+			"command": "npx parcel build --no-optimize",
+			"problemMatcher": {
+				"owner": "parcel",
+				"fileLocation": "absolute",
+				"pattern": {
+					"regexp": "^\\s(.*):(\\d+):(\\d+)",
+					"file": 1,
+					"line": 2,
+					"column": 3
+				}
+			}
+		},
+		{
+			"label": "parcel: build release",
+			"detail": "optimize",
+			"group": {
+				"kind": "build"
+			},
+			"type": "shell",
+			"command": "npx parcel build",
+			"problemMatcher": []
+		},
+		{
+			"label": "userscript: package debug",
+			"detail": "insert userscript header",
+			"group": {
+				"kind": "build"
+			},
+			"type": "process",
+			"command": "ls",
+			"args": [
+				"-l",
+				"src/index.ts",
+				"dist/subreddit-filter.user.js"
+			],
+			"dependsOn": [
+				"parcel: build debug"
+			],
+			"problemMatcher": []
+		}
+	]
+}

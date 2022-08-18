@@ -1,0 +1,46 @@
+{
+  "name": "subreddit-filter",
+  "version": "1.0.65",
+  "description": "Filter subreddits from your reddit feed.",
+  "workspaces": [
+    "src",
+    "parcel-plugins/*"
+  ],
+  "source": "src/index.ts",
+  "subreddit-filter": "dist/subreddit-filter.user.js",
+  "targets": {
+    "subreddit-filter": {
+      "context": "browser",
+      "outputFormat": "global",
+      "optimize": true,
+      "engines": {
+        "browsers": "since 2018"
+      }
+    }
+  },
+  "scripts": {
+    "test": "echo 'Error: no tests yet' && exit 1",
+    "debug": "npx parcel build --no-optimize",
+    "release": "npx parcel build --optimize"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stevehartwell/notyet.git"
+  },
+  "keywords": [
+    "userscript",
+    "greasemonkey",
+    "reddit"
+  ],
+  "author": "Steve Hartwell",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stevehartwell/notyet/issues"
+  },
+  "homepage": "https://github.com/stevehartwell/notyet#readme",
+  "devDependencies": {
+    "@parcel/transformer-inline-string": "^2.7.0",
+    "@types/greasemonkey": "^4.0.3",
+    "parcel": "^2.7.0"
+  }
+}
