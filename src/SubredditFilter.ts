@@ -1,7 +1,7 @@
 //
 
 import FilterSet from './FilterSet';
-import FilterView from './FilterView';
+import FilterConfigView from './FilterConfigView';
 
 export default class SubredditFilter {
     static async run() {
@@ -11,12 +11,12 @@ export default class SubredditFilter {
     }
 
     private _filterSet: FilterSet;
-    private _filterView: FilterView;
-    private _observer: MutationObserver;
+    private _configView: FilterConfigView;
+    private _addedNodesObserver: MutationObserver;
 
     constructor(filterSet: FilterSet) {
         this._filterSet = filterSet;
-        this._filterView = new FilterView(filterSet);
+        this._configView = new FilterConfigView(filterSet);
 
         if (document.readyState == 'complete') {
             this._applyFilters(document.body);
@@ -27,14 +27,14 @@ export default class SubredditFilter {
             });
         }
 
-        this._observer = new MutationObserver((mutations) => {
+        this._addedNodesObserver = new MutationObserver((mutations) => {
             for (const aMutation of mutations) {
                 for (const anAddedNode of aMutation.addedNodes) {
                     this._applyFilters(anAddedNode as HTMLElement);
                 }
             }
         });
-        this._observer.observe(document.body, {
+        this._addedNodesObserver.observe(document.body, {
             childList: true, subtree: true
         });
     }
@@ -96,7 +96,7 @@ export default class SubredditFilter {
 
     // add sub to list of filters
     private _hideSubreddit(sub: string) {
-        this._filterView.filter(sub, true);
+        this._configView.filter(sub, true);
         this._applyFilters(document.body);
     }
 }
