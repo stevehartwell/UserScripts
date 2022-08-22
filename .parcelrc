@@ -1,18 +1,7 @@
 {
     "extends": "@parcel/config-default",
-    "transformers": {
-        "bundle-text:*": [
-            "...",
-            "@parcel/transformer-inline-string"
-        ],
-        "data-url:*": [
-            "...",
-            "@parcel/transformer-inline-string"
-        ]
-    },
     "compressors": {
         "dist/subreddit-filter.user.js": [
-            "...",
             "parcel-compressor-userscript"
         ]
     }

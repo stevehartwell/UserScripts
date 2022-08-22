@@ -12,13 +12,15 @@ export default class FilterSet {
             GM.getValue(this._hiddenSubredditsKey, "[]"),
             GM.getValue(this._hidePromotedKey, true)
         ];
-        return Promise.all(promises)
-            .then((values) => {
-                console.info("saved values:", values);
-                const subreddits = JSON.parse(values[0] as string) as string[];
-                const hidePromoted = values[1] as boolean;
-                return new FilterSet(new Set(subreddits), hidePromoted);
-            });
+        return Promise.all(promises).then((values) => {
+            console.info("saved values:", values);
+            let subreddits = values[0] as (string | string[]);
+            if (typeof subreddits === 'string') {
+                subreddits = JSON.parse(subreddits) as string[];
+            }
+            const hidePromoted = values[1] as boolean;
+            return new FilterSet(new Set(subreddits), hidePromoted);
+        });
     }
 
     private _hiddenSubreddits: Set<string>;
@@ -53,12 +55,20 @@ export default class FilterSet {
 
     filter(sub: string, hide: boolean) {
         if (this.isHidden(sub) == hide) {
-            return;
+            return false;
         }
         if (hide) this._hiddenSubreddits.add(sub);
         else /**/ this._hiddenSubreddits.delete(sub);
 
-        const storeValue = JSON.stringify([...this._hiddenSubreddits]);
-        GM.setValue(FilterSet._hiddenSubredditsKey, storeValue);
+        const arrayValue = [...this._hiddenSubreddits];
+        try {
+            GM.setValue(FilterSet._hiddenSubredditsKey, arrayValue as any);
+        }
+        catch (err) {
+            console.log("!!! GM.setValue array:", err);
+            const stringValue = JSON.stringify(arrayValue);
+            GM.setValue(FilterSet._hiddenSubredditsKey, stringValue);
+        }
+        return true;
     }
 }

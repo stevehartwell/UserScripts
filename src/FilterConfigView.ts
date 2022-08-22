@@ -28,12 +28,13 @@ export default class FilterConfigView {
         });
         noProLabel.append(noProCheckbox, "Hide Promoted posts");
 
-        this._ul = document.createElement('ul');
-        this._ul.classList.add('subfilt-scroll-list');
-        this._ul.replaceChildren(...this._filterSet.sorted().map((aSub) => {
-            return this._createLI(aSub);
-        }));
-        this._ul.addEventListener('change', (event) => {
+        this._filteredSubreddits = document.createElement('ul');
+        this._filteredSubreddits.classList.add('subfilt-scroll-list');
+        this._filteredSubreddits.replaceChildren(...this._filterSet.sorted()
+            .map((aSub) => {
+                return _createLI(aSub);
+            }));
+        this._filteredSubreddits.addEventListener('change', (event) => {
             const target = event.target as HTMLInputElement;
             if (!target?.matches('input[type=checkbox]')) {
                 console.log(`!!! ignoring change event on ${target?.nodeName}`);
@@ -42,50 +43,64 @@ export default class FilterConfigView {
             const sub = target?.parentElement?.textContent; // enclosing label
             this.filter(sub as string, target.checked);
         });
-        configView.append(header, noProLabel, this._ul);
+        configView.append(header, noProLabel, this._filteredSubreddits);
 
-        document.body.append(...this._createConfigDialog(), configView);
+        document.body.append(..._createConfigDialog(), configView);
     }
     private _filterSet: FilterSet;
-    private _ul: HTMLElement;
+    private _filteredSubreddits: HTMLElement;
 
     filter(sub: string, hide: boolean) {
-        this._filterSet.filter(sub, hide);
+        if (!this._filterSet.filter(sub, hide)) {
+            return;
+        }
         if (hide) {
             // SHH FIXME insert in sort order
-            this._ul.insertBefore(this._createLI(sub), this._ul.firstChild);
+            this._filteredSubreddits.insertBefore(_createLI(sub),
+                this._filteredSubreddits.firstChild);
         }
         // else {
         //     // leave in list for now.
         // }
     }
+}
 
-    private _createConfigDialog() {
-        const idToggleConfigView = 'subfilt-config-checkbox';
 
-        const toggleViewCheckbox = document.createElement('input');
-        toggleViewCheckbox.type = 'checkbox';
-        toggleViewCheckbox.id = idToggleConfigView;
+function _createConfigDialog(): Node[] {
+    const idToggle = 'subfilt-config-checkbox';
+    return [
+        _html('input', { type: 'checkbox', id: idToggle }),
+        _html('label', { className: 'subfilt-config-toggle', for: idToggle }),
+        _html('div', { className: 'subfilt-config-present' })
+    ]
+}
 
-        const toggleViewLabel = document.createElement('label');
-        toggleViewLabel.classList.add('subfilt-config-toggle');
-        toggleViewLabel.setAttribute('for', idToggleConfigView);
-        // togLabel.setAttribute('aria-label', '...');
+function _createLI(sub: string) {
+    return (
+        _html('li', {},
+            _html('label', {},
+                _html('input', { type: 'checkbox', checked: true }),
+                sub
+            )
+        )
+    );
+}
 
-        const configPresent = document.createElement('div');
-        configPresent.classList.add('subfilt-config-present');
-
-        return [toggleViewCheckbox, toggleViewLabel, configPresent];
+function _html(tag: string, attrs?: Object, ...children: (string | Node)[]) {
+    const elem = document.createElement(tag);
+    for (const [attr, value] of Object.entries(attrs || {})) {
+        if (typeof value === 'function'
+            || (typeof value === 'object' && 'handleEvent' in value)) {
+            const name = attr.startsWith('on') ? attr.slice(2) : attr;
+            document.addEventListener(name, value);
+            continue;
+        }
+        if (attr in elem) {
+            (elem as any)[attr] = value;
+        } else {
+            elem.setAttribute(attr, value);
+        }
     }
-
-    private _createLI(sub: string) {
-        const li = document.createElement('li');
-        const label = document.createElement('label');
-        const checkbox = document.createElement('input');
-        checkbox.setAttribute('type', 'checkbox');
-        checkbox.checked = true;
-        label.append(checkbox, sub);
-        li.append(label);
-        return li;
-    }
+    elem.append(...children);
+    return elem;
 }

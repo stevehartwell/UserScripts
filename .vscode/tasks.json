@@ -1,15 +1,16 @@
 {
+	// See https://go.microsoft.com/fwlink/?LinkId=733558
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "parcel: build debug",
+			"label": "parcel: build develop",
 			"detail": "no-optimize",
 			"group": {
 				"kind": "build",
 				"isDefault": true
 			},
-			"type": "shell",
-			"command": "npx parcel build --no-optimize",
+			"type": "npm",
+			"script": "develop",
 			"problemMatcher": {
 				"owner": "parcel",
 				"fileLocation": "absolute",
@@ -27,26 +28,8 @@
 			"group": {
 				"kind": "build"
 			},
-			"type": "shell",
-			"command": "npx parcel build",
-			"problemMatcher": []
-		},
-		{
-			"label": "userscript: package debug",
-			"detail": "insert userscript header",
-			"group": {
-				"kind": "build"
-			},
-			"type": "process",
-			"command": "ls",
-			"args": [
-				"-l",
-				"src/index.ts",
-				"dist/subreddit-filter.user.js"
-			],
-			"dependsOn": [
-				"parcel: build debug"
-			],
+			"type": "npm",
+			"script": "build",
 			"problemMatcher": []
 		}
 	]
