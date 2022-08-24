@@ -27,6 +27,7 @@
     "userscript": {
       "context": "browser",
       "outputFormat": "global",
+      "sourceMap": false,
       "optimize": true
     }
   },
@@ -44,7 +45,9 @@
     "url": "https://github.com/stevehartwell/subreddit-filter.git"
   },
   "devDependencies": {
+    "@parcel/optimizer-data-url": "^2.7.0",
     "@parcel/transformer-inline-string": "^2.7.0",
+    "@parcel/utils": "^2.7.0",
     "@types/greasemonkey": "^4.0.3",
     "parcel": "^2.7.0"
   }

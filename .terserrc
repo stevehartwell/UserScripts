@@ -1,6 +1,0 @@
-{
-    "format": {
-        "preamble": "// this will be\n// inserted at the top",
-        "comments": "/^// +@/"
-    }
-}

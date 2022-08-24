@@ -9,5 +9,16 @@
     "typescript.enablePromptUseWorkspaceTsdk": true,
     "js/ts.implicitProjectConfig.module": "ESNext",
     "js/ts.implicitProjectConfig.target": "ESNext",
-    "css.format.spaceAroundSelectorSeparator": true
+    "css.format.spaceAroundSelectorSeparator": true,
+    "debug.javascript.autoAttachFilter": "disabled",
+    "[xml]": {
+        "editor.defaultFormatter": "DotJoshJohnson.xml"
+    },
+    "[svg]": {
+        "editor.defaultFormatter": "jock.svg"
+    },
+    "svg.preview.background": "transparent",
+    "[html]": {
+        "editor.defaultFormatter": "vscode.html-language-features"
+    }
 }

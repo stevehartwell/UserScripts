@@ -1,35 +1,31 @@
 //
 //
-// import 'greasemonkey';
+// import '@types/greasemonkey';
 
-export default class FilterSet {
-
-    private static get _hiddenSubredditsKey() { return 'hiddenSubreddits'; }
-    private static get _hidePromotedKey() { return 'hidePromoted'; }
+export default class FilterConfig {
 
     static async load() {
         const promises = [
-            GM.getValue(this._hiddenSubredditsKey, "[]"),
-            GM.getValue(this._hidePromotedKey, true)
+            GM.getValue(_hiddenSubredditsKey, "[]"),
+            GM.getValue(_hidePromotedKey, true)
         ];
         return Promise.all(promises).then((values) => {
-            console.info("saved values:", values);
+            // console.info("saved values:", values);
             let subreddits = values[0] as (string | string[]);
             if (typeof subreddits === 'string') {
                 subreddits = JSON.parse(subreddits) as string[];
             }
             const hidePromoted = values[1] as boolean;
-            return new FilterSet(new Set(subreddits), hidePromoted);
+            return new FilterConfig(new Set(subreddits), hidePromoted);
         });
     }
-
-    private _hiddenSubreddits: Set<string>;
-    private _hidePromoted: boolean;
 
     constructor(hiddenSubreddits: Set<string>, hidePromoted: boolean) {
         this._hiddenSubreddits = hiddenSubreddits;
         this._hidePromoted = hidePromoted;
     }
+    private _hiddenSubreddits: Set<string>;
+    private _hidePromoted: boolean;
 
     get hidePromoted() {
         return this._hidePromoted;
@@ -39,7 +35,7 @@ export default class FilterSet {
             return;
         }
         this._hidePromoted = newValue;
-        GM.setValue(FilterSet._hidePromotedKey, newValue);
+        GM.setValue(_hidePromotedKey, newValue);
         // TODO refresh
     }
 
@@ -62,13 +58,18 @@ export default class FilterSet {
 
         const arrayValue = [...this._hiddenSubreddits];
         try {
-            GM.setValue(FilterSet._hiddenSubredditsKey, arrayValue as any);
+            GM.setValue(_hiddenSubredditsKey, arrayValue as any);
         }
-        catch (err) {
-            console.log("!!! GM.setValue array:", err);
-            const stringValue = JSON.stringify(arrayValue);
-            GM.setValue(FilterSet._hiddenSubredditsKey, stringValue);
+        catch {
+            GM.setValue(_hiddenSubredditsKey, JSON.stringify(arrayValue));
         }
         return true;
     }
+
+    async getConfig() {
+
+    }
 }
+
+const _hidePromotedKey = 'hidePromoted';
+const _hiddenSubredditsKey = 'hiddenSubreddits';

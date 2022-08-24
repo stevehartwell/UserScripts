@@ -1,57 +1,80 @@
 //
-import FilterSet from './FilterSet';
+import FilterConfig from './FilterConfig';
+import _html from './html';
 
 import configViewStyles from 'bundle-text:./FilterConfigView.css';
 
 export default class FilterConfigView {
 
-    constructor(filterSet: FilterSet) {
-        this._filterSet = filterSet;
+    constructor(config: FilterConfig) {
+        this._config = config;
 
-        const styles = document.createElement('style');
-        styles.textContent = configViewStyles;
-        document.head.appendChild(styles);
+        document.head.appendChild(_html('style', {
+            textContent: configViewStyles
+        }));
 
-        const configView = document.createElement('div');
-        configView.classList.add('subfilt-config-view');
+        this._filteredSubreddits = (
+            _html('ul',
+                {
+                    onchange: (event: Event) => {
+                        const target = event.target as HTMLInputElement;
+                        if (!target?.matches('input[type=checkbox]')) {
+                            console.info(`?? event on ${target?.nodeName}`);
+                            return;
+                        }
+                        // enclosing label
+                        const sub = target?.parentElement?.textContent;
+                        this.filter(sub as string, target.checked);
+                    },
+                },
+                ...this._config.sorted().map((aSub) => _createLI(aSub))
+            )
+        );
 
-        const header = document.createElement('div');
-        header.append("Subreddit Filters");
-
-        const noProLabel = document.createElement('label');
-        const noProCheckbox = document.createElement('input');
-        noProCheckbox.type = 'checkbox';
-        noProCheckbox.checked = this._filterSet.hidePromoted;
-        noProCheckbox.addEventListener('change', (event) => {
-            const cxb = event?.target as HTMLInputElement;
-            this._filterSet.hidePromoted = cxb.checked;
-        });
-        noProLabel.append(noProCheckbox, "Hide Promoted posts");
-
-        this._filteredSubreddits = document.createElement('ul');
-        this._filteredSubreddits.classList.add('subfilt-scroll-list');
-        this._filteredSubreddits.replaceChildren(...this._filterSet.sorted()
-            .map((aSub) => {
-                return _createLI(aSub);
-            }));
-        this._filteredSubreddits.addEventListener('change', (event) => {
-            const target = event.target as HTMLInputElement;
-            if (!target?.matches('input[type=checkbox]')) {
-                console.log(`!!! ignoring change event on ${target?.nodeName}`);
-                return;
-            }
-            const sub = target?.parentElement?.textContent; // enclosing label
-            this.filter(sub as string, target.checked);
-        });
-        configView.append(header, noProLabel, this._filteredSubreddits);
+        const configView = (
+            _html('aside', { className: 'subfilt-config-pane' },
+                _html('header', {},
+                    _html('h1', {}, "Subreddit Filters"),
+                    _html('hr'),
+                    _html('label', {},
+                        _html('input', {
+                            type: 'checkbox',
+                            checked: this._config.hidePromoted,
+                            onchange: (event: Event) => {
+                                const cxb = event.target as HTMLInputElement;
+                                this._config.hidePromoted = cxb.checked;
+                            }
+                        }),
+                        "Hide Promoted posts"
+                    ),
+                    _html('hr')
+                ),
+                this._filteredSubreddits,
+                _html('hr'),
+                _html('footer', {},
+                    _html('button',
+                        {
+                            type: 'button',
+                            onclick: () => this.import()
+                        },
+                        "import"),
+                    _html('button',
+                        {
+                            type: 'button',
+                            onclick: () => this.export()
+                        },
+                        "export"),
+                )
+            )
+        );
 
         document.body.append(..._createConfigDialog(), configView);
     }
-    private _filterSet: FilterSet;
+    private _config: FilterConfig;
     private _filteredSubreddits: HTMLElement;
 
     filter(sub: string, hide: boolean) {
-        if (!this._filterSet.filter(sub, hide)) {
+        if (!this._config.filter(sub, hide)) {
             return;
         }
         if (hide) {
@@ -63,15 +86,21 @@ export default class FilterConfigView {
         //     // leave in list for now.
         // }
     }
-}
 
+    import() {
+        alert('import');
+    }
+    export() {
+        alert('export');
+    }
+}
 
 function _createConfigDialog(): Node[] {
     const idToggle = 'subfilt-config-checkbox';
     return [
         _html('input', { type: 'checkbox', id: idToggle }),
-        _html('label', { className: 'subfilt-config-toggle', for: idToggle }),
-        _html('div', { className: 'subfilt-config-present' })
+        _html('label', { className: 'subfilt-config-toggle', htmlFor: idToggle }),
+        _html('div', { className: 'subfilt-config-dialog' })
     ]
 }
 
@@ -86,21 +115,3 @@ function _createLI(sub: string) {
     );
 }
 
-function _html(tag: string, attrs?: Object, ...children: (string | Node)[]) {
-    const elem = document.createElement(tag);
-    for (const [attr, value] of Object.entries(attrs || {})) {
-        if (typeof value === 'function'
-            || (typeof value === 'object' && 'handleEvent' in value)) {
-            const name = attr.startsWith('on') ? attr.slice(2) : attr;
-            document.addEventListener(name, value);
-            continue;
-        }
-        if (attr in elem) {
-            (elem as any)[attr] = value;
-        } else {
-            elem.setAttribute(attr, value);
-        }
-    }
-    elem.append(...children);
-    return elem;
-}

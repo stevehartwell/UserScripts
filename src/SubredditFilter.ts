@@ -1,22 +1,17 @@
 //
 
-import FilterSet from './FilterSet';
+import FilterConfig from './FilterConfig';
 import FilterConfigView from './FilterConfigView';
 
 export default class SubredditFilter {
-    static async run() {
-        let filterSet = await FilterSet.load();
-        console.log(filterSet);
-        return new SubredditFilter(filterSet);
+    public static async run() {
+        let config = await FilterConfig.load();
+        return new SubredditFilter(config);
     }
 
-    private _filterSet: FilterSet;
-    private _configView: FilterConfigView;
-    private _addedNodesObserver: MutationObserver;
-
-    constructor(filterSet: FilterSet) {
-        this._filterSet = filterSet;
-        this._configView = new FilterConfigView(filterSet);
+    constructor(config: FilterConfig) {
+        this._config = config;
+        this._configView = new FilterConfigView(config);
 
         if (document.readyState == 'complete') {
             this._applyFilters(document.body);
@@ -38,10 +33,12 @@ export default class SubredditFilter {
             childList: true, subtree: true
         });
     }
+    private _config: FilterConfig;
+    private _configView: FilterConfigView;
+    private _addedNodesObserver: MutationObserver;
 
     private _applyFilters(root: HTMLElement) {
         if (!('querySelectorAll' in root)) {
-            console.log("!!! applyFilters: no querySelectorAll():", root);
             return;
         }
         for (const post of root.querySelectorAll('.scrollerItem')) {
@@ -57,7 +54,7 @@ export default class SubredditFilter {
         }
         const subLink = post.querySelector('[data-click-id=subreddit]');
         if (!subLink) {
-            if (this._filterSet.hidePromoted
+            if (this._config.hidePromoted
                 && (post.textContent as string).indexOf('promoted') >= 0) {
                 // SHH: maybe doable by .some-style {display: 'none' !important}?
                 // console.log("Filtering Promoted");
@@ -68,7 +65,7 @@ export default class SubredditFilter {
 
         const subreddit = (subLink as HTMLAnchorElement).pathname;
         // console.log('post in subreddit:', subreddit);
-        if (this._filterSet.isHidden(subreddit)) {
+        if (this._config.isHidden(subreddit)) {
             // console.log("^^^ Hiding");
             post.style.display = 'none';
             return;
@@ -97,6 +94,8 @@ export default class SubredditFilter {
     // add sub to list of filters
     private _hideSubreddit(sub: string) {
         this._configView.filter(sub, true);
+        // TODO: find all posts matching sub and just hide them
+        // for now:
         this._applyFilters(document.body);
     }
 }
