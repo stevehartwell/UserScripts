@@ -91,7 +91,22 @@ export default class FilterConfigView {
         alert('import');
     }
     export() {
-        alert('export');
+        let saveAs: string | null = "subreddit-filters.json";
+        saveAs = window.prompt("Download filter settings?", saveAs);
+        if (!saveAs) {
+            return;
+        }
+        let a = document.createElement('a');
+        a.download = saveAs!;
+        a.href = URL.createObjectURL(
+            new Blob([JSON.stringify(this._config)], {
+                type: 'application/json'
+            })
+        );
+        a.onclick = () => a.remove();
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
     }
 }
 
@@ -100,7 +115,7 @@ function _createConfigDialog(): Node[] {
     return [
         _html('input', { type: 'checkbox', id: idToggle }),
         _html('label', { className: 'subfilt-config-toggle', htmlFor: idToggle }),
-        _html('div', { className: 'subfilt-config-dialog' })
+        _html('div', { className: 'subfilt-config-backdrop' })
     ]
 }
 

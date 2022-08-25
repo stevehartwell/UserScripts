@@ -32,7 +32,7 @@
   transform: rotate(45deg);
 }
 
-.subfilt-config-dialog {
+.subfilt-config-backdrop {
   z-index: 100;
   position: fixed;
   top: 0;
@@ -42,7 +42,7 @@
   background: rgba(0, 0, 0, 0.75);
   display: none;
 }
-#subfilt-config-checkbox:checked ~ .subfilt-config-dialog {
+#subfilt-config-checkbox:checked ~ .subfilt-config-backdrop {
   display: block;
 }
 
@@ -66,16 +66,10 @@
   display: flex;
   flex-flow: column nowrap;
   font: caption;
-  /**/
-  /*   border: 4px dashed red; */
 }
 
 #subfilt-config-checkbox:checked ~ .subfilt-config-pane {
   transform: translate(0, 0);
-}
-
-.subfilt-config-pane input[type="checkbox"] {
-  margin-right: 4px;
 }
 
 .subfilt-config-pane header h1 {
@@ -89,12 +83,22 @@
   width: 96%;
 }
 
+.subfilt-config-pane label {
+  all: revert;
+  display: list-item;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.subfilt-config-pane input[type="checkbox"] {
+  margin-right: 4px;
+}
+
 .subfilt-config-pane ul {
   all: revert;
   list-style: none;
   padding: 0;
   margin: 0;
-  overflow: hidden;
   overflow-y: auto;
 }
 

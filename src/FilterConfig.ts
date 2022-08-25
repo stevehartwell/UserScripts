@@ -6,26 +6,35 @@ export default class FilterConfig {
 
     static async load() {
         const promises = [
-            GM.getValue(_hiddenSubredditsKey, "[]"),
-            GM.getValue(_hidePromotedKey, true)
+            GM.getValue(_hidePromotedKey, true),
+            GM.getValue(_hiddenSubredditsKey, "[]")
         ];
         return Promise.all(promises).then((values) => {
             // console.info("saved values:", values);
-            let subreddits = values[0] as (string | string[]);
+            let subreddits = values[1] as (string | string[]);
             if (typeof subreddits === 'string') {
                 subreddits = JSON.parse(subreddits) as string[];
             }
-            const hidePromoted = values[1] as boolean;
-            return new FilterConfig(new Set(subreddits), hidePromoted);
+            return new FilterConfig({
+                hidePromoted: values[0] as boolean,
+                hiddenSubreddits: subreddits
+            });
         });
     }
 
-    constructor(hiddenSubreddits: Set<string>, hidePromoted: boolean) {
-        this._hiddenSubreddits = hiddenSubreddits;
-        this._hidePromoted = hidePromoted;
+    constructor(config: Config) {
+        this._hidePromoted = config.hidePromoted;
+        this._hiddenSubreddits = new Set(config.hiddenSubreddits);
     }
-    private _hiddenSubreddits: Set<string>;
     private _hidePromoted: boolean;
+    private _hiddenSubreddits: Set<string>;
+
+    toJSON() {
+        return {
+            hidePromoted: this._hidePromoted,
+            hiddenSubreddits: Array.from(this._hiddenSubreddits)
+        };
+    }
 
     get hidePromoted() {
         return this._hidePromoted;
@@ -65,10 +74,11 @@ export default class FilterConfig {
         }
         return true;
     }
+}
 
-    async getConfig() {
-
-    }
+type Config = {
+    hidePromoted: boolean,
+    hiddenSubreddits: string[]
 }
 
 const _hidePromotedKey = 'hidePromoted';
