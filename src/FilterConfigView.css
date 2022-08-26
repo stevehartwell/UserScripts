@@ -2,11 +2,31 @@
  *
  */
 :root {
-  --subfilt-config-width: 240px;
+  color-scheme: light dark;
+}
+
+.subfilt-config {
+  z-index: 100;
+  position: fixed;
+  top: 0;
+  right: 0;
 }
 
 #subfilt-config-checkbox {
   display: none;
+}
+
+.subfilt-config-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+}
+#subfilt-config-checkbox:checked ~ .subfilt-config-backdrop {
+  display: block;
 }
 
 .subfilt-config-toggle {
@@ -24,52 +44,45 @@
   transform-origin: 50% 50%;
 }
 
-#subfilt-config-checkbox + .subfilt-config-toggle {
+#subfilt-config-checkbox ~ .subfilt-config-toggle {
   transform: rotate(0deg);
 }
-
-#subfilt-config-checkbox:checked + .subfilt-config-toggle {
+#subfilt-config-checkbox:checked ~ .subfilt-config-toggle {
   transform: rotate(45deg);
-}
-
-.subfilt-config-backdrop {
-  z-index: 100;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.75);
-  display: none;
-}
-#subfilt-config-checkbox:checked ~ .subfilt-config-backdrop {
-  display: block;
 }
 
 .subfilt-config-pane {
   all: revert;
-  z-index: 100;
+  --subfilt-config-width: 240px;
   position: fixed;
   top: 0;
   right: 0;
   box-sizing: border-box !important;
-  border: 20px solid transparent;
+  margin: 20px 0;
   padding: 4px;
   width: var(--subfilt-config-width);
-  max-height: 100%;
-  background: lightBlue;
-  background-clip: padding-box;
+  max-height: calc(100% - 40px);
 
-  transform: translate(var(--subfilt-config-width), 0);
-  transition: transform 0.5s;
+  background-color: canvas;
+  background-clip: padding-box;
+  border: 2px solid gray;
+  font: caption;
 
   display: flex;
   flex-flow: column nowrap;
-  font: caption;
+
+  transform: translate(var(--subfilt-config-width), 0);
+  transition: transform 0.5s;
 }
 
+/* @media (prefers-color-scheme: dark) {
+  .subfilt-config-pane {
+    background-color: canvas;
+  }
+} */
+
 #subfilt-config-checkbox:checked ~ .subfilt-config-pane {
-  transform: translate(0, 0);
+  transform: translate(-20px, 0);
 }
 
 .subfilt-config-pane header h1 {
@@ -89,6 +102,7 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  vertical-align: middle;
 }
 .subfilt-config-pane input[type="checkbox"] {
   margin-right: 4px;
@@ -96,13 +110,16 @@
 
 .subfilt-config-pane ul {
   all: revert;
+  border-top: 1px solid gray;
+  border-bottom: 1px solid gray;
+  margin: 4px 0;
+  padding: 4px 0;
   list-style: none;
-  padding: 0;
-  margin: 0;
   overflow-y: auto;
 }
 
 .subfilt-config-pane footer {
+  all: revert;
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-around;
@@ -110,4 +127,5 @@
 
 .subfilt-config-pane footer button {
   all: revert;
+  min-height: 20px;
 }

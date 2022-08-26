@@ -31,11 +31,10 @@ export default class FilterConfigView {
             )
         );
 
-        const configView = (
-            _html('aside', { className: 'subfilt-config-pane' },
+        const configPane = (
+            _html('div', { className: 'subfilt-config-pane' },
                 _html('header', {},
                     _html('h1', {}, "Subreddit Filters"),
-                    _html('hr'),
                     _html('label', {},
                         _html('input', {
                             type: 'checkbox',
@@ -46,11 +45,9 @@ export default class FilterConfigView {
                             }
                         }),
                         "Hide Promoted posts"
-                    ),
-                    _html('hr')
+                    )
                 ),
                 this._filteredSubreddits,
-                _html('hr'),
                 _html('footer', {},
                     _html('button',
                         {
@@ -68,7 +65,9 @@ export default class FilterConfigView {
             )
         );
 
-        document.body.append(..._createConfigDialog(), configView);
+        const dialog = _createConfigDialog();
+        dialog.appendChild(configPane);
+        document.body.append(dialog);
     }
     private _config: FilterConfig;
     private _filteredSubreddits: HTMLElement;
@@ -110,13 +109,21 @@ export default class FilterConfigView {
     }
 }
 
-function _createConfigDialog(): Node[] {
+function _createConfigDialog() {
     const idToggle = 'subfilt-config-checkbox';
-    return [
-        _html('input', { type: 'checkbox', id: idToggle }),
-        _html('label', { className: 'subfilt-config-toggle', htmlFor: idToggle }),
-        _html('div', { className: 'subfilt-config-backdrop' })
-    ]
+    return (
+        _html('aside', { className: 'subfilt-config' },
+            _html('input', { type: 'checkbox', id: idToggle }),
+            _html('label', {
+                className: 'subfilt-config-backdrop',
+                htmlFor: idToggle
+            }),
+            _html('label', {
+                className: 'subfilt-config-toggle',
+                htmlFor: idToggle
+            })
+        )
+    )
 }
 
 function _createLI(sub: string) {
