@@ -1,61 +1,115 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="FilterConfigView.css">
+    <link rel="stylesheet" href="FilterConfigView.css" />
 </head>
 
 <body>
-    <p>this is main content
-        <br>main content main content main content main content
-        <br>main content main content main content main content
-        <br>main content main content main content main content
-        <br>main content main content main content main content
-        <br>main content main content main content main content
-        <br>main content main content main content main content
-        <br>main content main content main content main content
-        <br>main content main content main content main content
-        <br>main content main content main content main content
-        <br>main content main content main content main content
+    <p>
+        this is main content <br />main content main content main content main
+        content <br />main content main content main content main content
+        <br />main content main content main content main content <br />main
+        content main content main content main content <br />main content main
+        content main content main content <br />main content main content main
+        content main content <br />main content main content main content main
+        content <br />main content main content main content main content
+        <br />main content main content main content main content <br />main
+        content main content main content main content
     </p>
     <!--  -->
-    <aside class='subfilt-config'>
-        <input type='checkbox' id='subfilt-config-checkbox'>
-        <label class='subfilt-config-backdrop' for='subfilt-config-checkbox'>
+    <aside class="subfilt-config">
+        <input type="checkbox" id="subfilt-config-checkbox" />
+        <label class="subfilt-config-backdrop" for="subfilt-config-checkbox">
         </label>
-        <label class='subfilt-config-toggle' for='subfilt-config-checkbox'>
+        <label class="subfilt-config-toggle" for="subfilt-config-checkbox">
         </label>
-        <div class='subfilt-config-pane'>
+        <div class="subfilt-config-pane">
             <header>
                 <h1>Title</h1>
-                <!-- <hr> -->
-                <label><input type="checkbox">promoted
-                    promoted promoted promoted-promoted-promoted-promoted
+                <label><input type="checkbox" />promoted promoted promoted
+                    promoted-promoted-promoted-promoted
                 </label>
-                <!-- <hr> -->
             </header>
             <ul>
-                <li><label><input type="checkbox">cb-1</label></li>
-                <li><label><input type="checkbox">cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2</label></li>
-                <li><label><input type="checkbox">cb-3</label></li>
-                <li><label><input type="checkbox">cb-4</label></li>
-                <li><label><input type="checkbox">cb-5</label></li>
-                <li><label><input type="checkbox">cb-6</label></li>
-                <li><label><input type="checkbox">cb-7</label></li>
-                <li><label><input type="checkbox">cb-8</label></li>
-                <li><label><input type="checkbox">cb-9</label></li>
-                <li><label><input type="checkbox">cb-10</label></li>
-                <li><label><input type="checkbox">cb-11</label></li>
-                <li><label><input type="checkbox">cb-12</label></li>
-                <li><label><input type="checkbox">cb-13</label></li>
-                <li><label><input type="checkbox">cb-LAST</label></li>
+                <li>
+                    <label><input type="checkbox" />cb-1</label>
+                </li>
+                <li>
+                    <label><input type="checkbox" />cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2cb2</label>
+                </li>
+                <li>
+                    <label><input type="checkbox" />cb-3</label>
+                </li>
+                <li>
+                    <label><input type="checkbox" />cb-4</label>
+                </li>
+                <li>
+                    <label><input type="checkbox" />cb-5</label>
+                </li>
+                <li>
+                    <label><input type="checkbox" />cb-6</label>
+                </li>
+                <li>
+                    <label><input type="checkbox" />cb-7</label>
+                </li>
+                <li>
+                    <label><input type="checkbox" />cb-8</label>
+                </li>
+                <li>
+                    <label><input type="checkbox" />cb-9</label>
+                </li>
+                <li>
+                    <label><input type="checkbox" />cb-10</label>
+                </li>
+                <li>
+                    <label><input type="checkbox" />cb-11</label>
+                </li>
+                <li>
+                    <label><input type="checkbox" />cb-12</label>
+                </li>
+                <li>
+                    <label><input type="checkbox" />cb-13</label>
+                </li>
+                <li>
+                    <label><input type="checkbox" />cb-LAST</label>
+                </li>
             </ul>
-            <!-- <hr> -->
             <footer>
-                <button>import</button>
-                <button>export</button>
+                <button>
+                    <label>import…
+                        <input type="file" onchange="getfile(event)">
+                    </label>
+                </button>
+                <button onclick="exportConfig(event)">
+                    <label>export…<a></a></label>
+                </button>
             </footer>
         </div>
     </aside>
+
+    <script>
+        function getfile(e) {
+            const r = new FileReader();
+            r.onloadend = () => {
+                console.log(r.error, r.result);
+            }
+            r.readAsText(e.target.files[0]);
+        }
+        function exportConfig(e) {
+            if (e.target.tagName !== 'LABEL') {
+                return; // ignore a.click() bubble up
+            }
+            const dummy = { one: 1, two: 2 };
+            const a = e.target.querySelector('a')
+            a.download = "subreddit-filters.json";
+            a.href = URL.createObjectURL(
+                new Blob([JSON.stringify(dummy)], {
+                    type: 'application/json'
+                })
+            );
+            a.click();
+        }
+    </script>
 </body>
 
 </html>

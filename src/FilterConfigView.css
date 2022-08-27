@@ -129,3 +129,7 @@
   all: revert;
   min-height: 20px;
 }
+
+.subfilt-config-pane footer button label :first-child {
+  display: none;
+}

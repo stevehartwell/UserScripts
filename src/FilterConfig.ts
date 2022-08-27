@@ -50,7 +50,8 @@ export default class FilterConfig {
 
     sorted() {
         return Array.from(this._hiddenSubreddits).sort((first, second) => {
-            return first.localeCompare(second);
+            return first.localeCompare(second,
+                undefined, { sensitivity: 'case' });
         });
     }
 
@@ -83,3 +84,29 @@ type Config = {
 
 const _hidePromotedKey = 'hidePromoted';
 const _hiddenSubredditsKey = 'hiddenSubreddits';
+
+function lowerBound<T>(item: T, array: T[], cmp?: (a: T, b: T) => number) {
+    const _cmp = cmp || ((a, b) => a < b ? -1 : a > b ? 1 : 0);
+    let lo = 0, hi = array.length;
+    while (lo < hi) {
+        const mid = (lo + hi) >> 1;
+        const ord = _cmp(item, array[mid]);
+        if (ord == 0) {
+            return mid;
+        }
+        if (ord < 0) {
+            hi = mid;
+        } else {
+            lo = mid + 1;
+        }
+    }
+    return -lo - 1;
+}
+
+function sortedInsert<T>(item: T, array: T[], cmp?: (a: T, b: T) => number) {
+    const ix = lowerBound(item, array, cmp);
+    console.log("item", item, "ix", ix, "value", array[ix]);
+    if (ix < 0) {
+        array.splice(-ix - 1, 0, item);
+    }
+}

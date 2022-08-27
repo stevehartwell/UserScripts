@@ -1,6 +1,6 @@
 //
 import FilterConfig from './FilterConfig';
-import _html from './html';
+import _htm from './html';
 
 import configViewStyles from 'bundle-text:./FilterConfigView.css';
 
@@ -9,68 +9,41 @@ export default class FilterConfigView {
     constructor(config: FilterConfig) {
         this._config = config;
 
-        document.head.appendChild(_html('style', {
+        document.head.appendChild(_htm('style', {
             textContent: configViewStyles
         }));
 
-        this._filteredSubreddits = (
-            _html('ul',
-                {
-                    onchange: (event: Event) => {
-                        const target = event.target as HTMLInputElement;
-                        if (!target?.matches('input[type=checkbox]')) {
-                            console.info(`?? event on ${target?.nodeName}`);
-                            return;
-                        }
-                        // enclosing label
-                        const sub = target?.parentElement?.textContent;
-                        this.filter(sub as string, target.checked);
-                    },
-                },
-                ...this._config.sorted().map((aSub) => _createLI(aSub))
-            )
-        );
+        this._hidePromoted = _htm('input', {
+            type: 'checkbox',
+            checked: this._config.hidePromoted,
+            onchange: (event: Event) => {
+                this._config.hidePromoted = this._hidePromoted.checked;
+            }
+        }) as HTMLInputElement;
 
-        const configPane = (
-            _html('div', { className: 'subfilt-config-pane' },
-                _html('header', {},
-                    _html('h1', {}, "Subreddit Filters"),
-                    _html('label', {},
-                        _html('input', {
-                            type: 'checkbox',
-                            checked: this._config.hidePromoted,
-                            onchange: (event: Event) => {
-                                const cxb = event.target as HTMLInputElement;
-                                this._config.hidePromoted = cxb.checked;
-                            }
-                        }),
-                        "Hide Promoted posts"
-                    )
-                ),
-                this._filteredSubreddits,
-                _html('footer', {},
-                    _html('button',
-                        {
-                            type: 'button',
-                            onclick: () => this.import()
-                        },
-                        "import"),
-                    _html('button',
-                        {
-                            type: 'button',
-                            onclick: () => this.export()
-                        },
-                        "export"),
-                )
-            )
+        this._filteredSubreddits = (
+            _htm('ul', {
+                onchange: (event: Event) => {
+                    const target = event.target as HTMLInputElement;
+                    if (!target?.matches('input[type=checkbox]')) {
+                        console.info(`?? event on ${target?.nodeName}`);
+                        return;
+                    }
+                    // enclosing label
+                    const sub = target?.parentElement?.textContent;
+                    this.filter(sub as string, target.checked);
+                }
+            })
         );
 
         const dialog = _createConfigDialog();
-        dialog.appendChild(configPane);
+        dialog.appendChild(this._createConfigPane());
         document.body.append(dialog);
+        this._reload();
     }
     private _config: FilterConfig;
-    private _filteredSubreddits: HTMLElement;
+    private _hidePromoted: HTMLInputElement;    // input[type='checkbox']
+    private _filteredSubreddits: HTMLElement;   // ul
 
     filter(sub: string, hide: boolean) {
         if (!this._config.filter(sub, hide)) {
@@ -86,25 +59,72 @@ export default class FilterConfigView {
         // }
     }
 
-    import() {
-        alert('import');
+    private _reload() {
+        this._hidePromoted.checked = this._config.hidePromoted;
+        this._filteredSubreddits.replaceChildren(); // free up old
+        this._filteredSubreddits.replaceChildren(
+            ...this._config.sorted().map((aSub) => _createLI(aSub))
+        )
     }
-    export() {
-        let saveAs: string | null = "subreddit-filters.json";
-        saveAs = window.prompt("Download filter settings?", saveAs);
-        if (!saveAs) {
-            return;
+
+    private _createConfigPane() {
+        return (
+            _htm('div', { className: 'subfilt-config-pane' },
+                _htm('header', {},
+                    _htm('h1', {}, "Subreddit Filters"),
+                    _htm('label', {},
+                        this._hidePromoted,
+                        "Hide Promoted posts"
+                    )
+                ),
+                this._filteredSubreddits,
+                _htm('footer', {},
+                    _htm('button', { type: 'button' },
+                        _htm('label', {},
+                            "import…",
+                            _htm('input', {
+                                type: 'file',
+                                onchange: (ev: Event) => this._importConfig(ev)
+                            })
+                        )
+                    ),
+                    _htm('button',
+                        {
+                            type: 'button',
+                            onclick: (ev: Event) => this._exportConfig(ev)
+                        },
+                        _htm('label', {},
+                            "export…",
+                            _htm('a')
+                        )
+                    )
+                )
+            )
+        );
+    }
+
+    private _importConfig(ev: Event) {
+        let target = ev.target as HTMLInputElement;
+        const r = new FileReader();
+        r.onloadend = () => {
+            console.log(r.error, r.result);
         }
-        let a = document.createElement('a');
-        a.download = saveAs!;
+        r.readAsText(target.files![0]);
+    }
+
+    private _exportConfig(ev: Event) {
+        let target = ev.target as HTMLElement;
+        if (target.tagName !== 'LABEL') {
+            return; // ignore a.click() bubble up
+        }
+        const a = target.querySelector('a')
+        if (!a) return;
+        a.download = "subreddit-filters.json";
         a.href = URL.createObjectURL(
             new Blob([JSON.stringify(this._config)], {
                 type: 'application/json'
             })
         );
-        a.onclick = () => a.remove();
-        a.style.display = 'none';
-        document.body.appendChild(a);
         a.click();
     }
 }
@@ -112,13 +132,13 @@ export default class FilterConfigView {
 function _createConfigDialog() {
     const idToggle = 'subfilt-config-checkbox';
     return (
-        _html('aside', { className: 'subfilt-config' },
-            _html('input', { type: 'checkbox', id: idToggle }),
-            _html('label', {
+        _htm('aside', { className: 'subfilt-config' },
+            _htm('input', { type: 'checkbox', id: idToggle }),
+            _htm('label', {
                 className: 'subfilt-config-backdrop',
                 htmlFor: idToggle
             }),
-            _html('label', {
+            _htm('label', {
                 className: 'subfilt-config-toggle',
                 htmlFor: idToggle
             })
@@ -128,9 +148,9 @@ function _createConfigDialog() {
 
 function _createLI(sub: string) {
     return (
-        _html('li', {},
-            _html('label', {},
-                _html('input', { type: 'checkbox', checked: true }),
+        _htm('li', {},
+            _htm('label', {},
+                _htm('input', { type: 'checkbox', checked: true }),
                 sub
             )
         )
