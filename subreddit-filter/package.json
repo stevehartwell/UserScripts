@@ -8,9 +8,9 @@
     "greasemonkey",
     "reddit"
   ],
-  "homepage": "https://github.com/stevehartwell/subreddit-filter#readme",
+  "homepage": "https://github.com/stevehartwell/UserScripts/subreddit-filter#readme",
   "bugs": {
-    "url": "https://github.com/stevehartwell/subreddit-filter/issues"
+    "url": "https://github.com/stevehartwell/UserScripts/issues"
   },
   "author": {
     "name": "Steve Hartwell",
@@ -38,17 +38,19 @@
   },
   "workspaces": [
     "src",
-    "parcel-plugins/*"
+    "../@parcel-plugins/parcel-optimizer-userscript"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/stevehartwell/subreddit-filter.git"
+    "url": "https://github.com/stevehartwell/UserScripts.git"
+  },
+  "peerDependencies": {
+    "parcel": "^2.7.0"
   },
   "devDependencies": {
     "@parcel/optimizer-data-url": "^2.7.0",
     "@parcel/transformer-inline-string": "^2.7.0",
-    "@parcel/utils": "^2.7.0",
     "@types/greasemonkey": "^4.0.3",
-    "parcel": "^2.7.0"
+    "parcel-optimizer-userscript": "^1.0.0"
   }
 }

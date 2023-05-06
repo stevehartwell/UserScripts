@@ -9,7 +9,7 @@ const { Readable } = require("stream");
 const { createReadStream } = require("fs");
 const { createInterface } = require("readline");
 
-exports.default = new Optimizer({
+module.exports = new Optimizer({
   // bundle: NamedBundle,
   // bundleGraph: BundleGraph<NamedBundle>,
   // contents: Blob,

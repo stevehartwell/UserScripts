@@ -1,0 +1,21 @@
+{
+    "name": "parcel-optimizer-userscript",
+    "version": "1.0.0",
+    "license": "MIT",
+    "main": "add-userscript-header.cjs",
+    "type": "module",
+    "engines": {
+        "node": ">= 12.0.0",
+        "parcel": "^2.7.0"
+    },
+    "scripts": {
+        "build": "parcel build ."
+    },
+    "dependencies": {
+        "@parcel/plugin": "^2.7.0",
+        "@parcel/utils": "^2.7.0"
+    },
+    "peerDependencies": {
+        "parcel": "^2.7.0"
+    }
+}
